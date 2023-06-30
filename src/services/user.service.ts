@@ -1,7 +1,10 @@
-import { AppError } from "../errors/AppError";
+import { OkPacket } from "mysql2";
+
 import { Database } from "../util/database";
 
-import { convertTextInHash } from "../util/hash";
+import bcrypt from "bcrypt";
+import { AppError } from "../errors/AppError";
+import { User } from "../model/User";
 
 interface ICreateUser {
   username: string;
@@ -13,14 +16,34 @@ export class UserService {
   constructor(private database: Database) {}
 
   async create({ username, email, password }: ICreateUser): Promise<void> {
-    const sql = `INSERT INTO users (username, email, password) VALUES (?, ?, ?);`;
-    const newPassword = await convertTextInHash(password);
-    const params = [username, email, newPassword];
+    const userAlreadyExists = await this.findUserByUsername(username);
 
-    this.database.conn.query(sql, params, (err, result) => {
-      if (err) {
-        throw new AppError(err.message);
-      }
+    if (userAlreadyExists) {
+      throw new AppError("User Already exists!");
+    }
+
+    const sql = `INSERT INTO users (username, email, password) VALUES (?, ?, ?);`;
+    const passwordHash = await bcrypt.hash(password, 8);
+    const params = [username, email, passwordHash];
+
+    await new Promise<Number>((resolve, reject) => {
+      this.database.conn.query<OkPacket>(sql, params, (err, res) => {
+        if (err) reject(err.message);
+
+        resolve(res.insertId);
+      });
+    });
+  }
+
+  private findUserByUsername(username: string): Promise<User | undefined> {
+    const sql = `SELECT * FROM users WHERE username = '${username}';`;
+
+    return new Promise((resolve, reject) => {
+      this.database.conn.query<User[]>(sql, (err, res) => {
+        if (err) reject(err.message);
+
+        resolve(res?.[0]);
+      });
     });
   }
 }

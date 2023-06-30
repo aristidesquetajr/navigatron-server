@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
-import { z, ZodError } from "zod";
-import { AppError } from "../errors/AppError";
+import { z } from "zod";
 
 import { UserService } from "../services/user.service";
 
@@ -9,20 +8,15 @@ export class UserController {
 
   async createAccount(request: Request, response: Response): Promise<Response> {
     const userSchema = z.object({
-      username: z.string().nonempty(),
+      username: z.string().nonempty().toLowerCase(),
       email: z.string().email(),
       password: z.string().nonempty(),
     });
 
-    try {
-      const { username, email, password } = userSchema.parse(request.body);
-  
-      await this.userService.create({ username, email, password })
-  
-      return response.status(201).send();
+    const { username, email, password } = userSchema.parse(request.body);
 
-    } catch(err) {
-      return response.status(400).send(err)
-    }
+    await this.userService.create({ username, email, password });
+
+    return response.status(201).send();
   }
 }
