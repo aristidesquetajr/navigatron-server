@@ -14,3 +14,4 @@ const userController = new UserController(userService)
 
 
 userRoutes.post("/", (req, res) => userController.createAccount(req, res));
+userRoutes.post("/authenticate", (req, res) => userController.authenticate(req, res));

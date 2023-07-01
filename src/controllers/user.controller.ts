@@ -19,4 +19,17 @@ export class UserController {
 
     return response.status(201).send();
   }
+
+  async authenticate(request: Request, response: Response): Promise<Response> {
+    const authSchema = z.object({
+      username: z.string().nonempty().toLowerCase(),
+      password: z.string().nonempty(),
+    });
+
+    const { username, password } = authSchema.parse(request.body);
+
+    const token = await this.userService.authenticate({ username, password })
+
+    return response.json(token);
+  }
 }
