@@ -1,3 +1,6 @@
+import "reflect-metadata";
+import "./shared/container";
+
 import express, { Application, NextFunction, Request, Response } from "express";
 import "express-async-errors";
 
@@ -35,7 +38,7 @@ class App {
       ) => {
         if (err instanceof AppError) {
           return response.status(err.statusCode).json({
-            message: err.message
+            message: err.message,
           });
         }
 

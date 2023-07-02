@@ -1,9 +1,7 @@
 import { container } from "tsyringe";
 
-import { UserService } from "../../services/user.service";
 import { Database } from "../../util/database";
+import { UserService } from "../../services/user.service";
 
-container.register(
-  "UserService",
-  UserService
-);
+container.registerSingleton("Database", Database);
+container.registerSingleton("UserService", UserService);

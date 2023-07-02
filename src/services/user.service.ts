@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { inject, injectable } from "tsyringe";
 
 import { OkPacket } from "mysql2";
 import { hash, compare } from "bcrypt";
@@ -25,8 +26,9 @@ interface IAuthenticateResponse {
   };
 }
 
+@injectable()
 export class UserService {
-  constructor(private database: Database) {}
+  constructor(@inject("Database") private database: Database) {}
 
   async create({ email, password }: ICreateUser): Promise<void> {
     const userAlreadyExists = await this.findUserByEmail(email);

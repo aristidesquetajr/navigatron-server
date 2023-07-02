@@ -1,10 +1,12 @@
+import { injectable, inject } from "tsyringe";
 import { Request, Response } from "express";
 import { z } from "zod";
 
 import { UserService } from "../services/user.service";
 
+@injectable()
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(@inject("UserService") private userService: UserService) {}
 
   async createAccount(request: Request, response: Response): Promise<Response> {
     const userSchema = z.object({
@@ -27,7 +29,7 @@ export class UserController {
 
     const { email, password } = authSchema.parse(request.body);
 
-    const token = await this.userService.authenticate({ email, password })
+    const token = await this.userService.authenticate({ email, password });
 
     return response.json(token);
   }
