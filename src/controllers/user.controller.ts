@@ -8,27 +8,26 @@ export class UserController {
 
   async createAccount(request: Request, response: Response): Promise<Response> {
     const userSchema = z.object({
-      username: z.string().nonempty().toLowerCase(),
       email: z.string().email(),
       password: z.string().nonempty(),
     });
 
-    const { username, email, password } = userSchema.parse(request.body);
+    const { email, password } = userSchema.parse(request.body);
 
-    await this.userService.create({ username, email, password });
+    await this.userService.create({ email, password });
 
     return response.status(201).send();
   }
 
   async authenticate(request: Request, response: Response): Promise<Response> {
     const authSchema = z.object({
-      username: z.string().nonempty().toLowerCase(),
+      email: z.string().email(),
       password: z.string().nonempty(),
     });
 
-    const { username, password } = authSchema.parse(request.body);
+    const { email, password } = authSchema.parse(request.body);
 
-    const token = await this.userService.authenticate({ username, password })
+    const token = await this.userService.authenticate({ email, password })
 
     return response.json(token);
   }
