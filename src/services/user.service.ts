@@ -89,4 +89,16 @@ export class UserService {
 
     return tokenReturn;
   }
+
+  findUserById(id: string): Promise<User | undefined> {
+    const sql = `SELECT * FROM users WHERE id = ${id};`;
+
+    return new Promise((resolve, reject) => {
+      this.database.conn.query<User[]>(sql, (err, res) => {
+        if(err) reject(err.message)
+
+        resolve(res?.[0])
+      });
+    });
+  }
 }
