@@ -34,4 +34,12 @@ export class NavigationController {
 
     return response.status(201).send();
   }
+
+  async listNavigationByUser(request: Request, response: Response): Promise<Response> {
+    const { user_id } = request;
+
+    const navigations = await this.navigationService.listNavigationByUser(user_id);
+
+    return response.json(navigations)
+  }
 }
