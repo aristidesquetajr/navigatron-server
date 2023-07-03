@@ -5,8 +5,8 @@ import { Database } from "../util/database";
 
 interface ICreateNavigation {
   fk_user: number;
-  currentLocate: string;
-  nextLocate: string;
+  origin: string;
+  destiny: string;
   duration: string;
 }
 
@@ -16,13 +16,13 @@ export class NavigationService {
 
   async createNavigation({
     fk_user,
-    currentLocate,
-    nextLocate,
+    origin,
+    destiny,
     duration,
   }: ICreateNavigation): Promise<void> {
     const sql =
-      "INSERT INTO navigations (fk_user, currentLocate, nextLocate, duration) VALUES (?, ?, ?, ?)";
-    const params = [fk_user, currentLocate, nextLocate, duration];
+      "INSERT INTO navigations (fk_user, origin, destiny, duration) VALUES (?, ?, ?, ?)";
+    const params = [fk_user, origin, destiny, duration];
 
     await new Promise((resolve, reject) => {
       this.database.conn.query<OkPacket>(sql, params, (err, res) => {

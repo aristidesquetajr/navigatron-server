@@ -41,12 +41,8 @@ export class UserService {
     const passwordHash = await hash(password, 8);
     const params = [email, passwordHash];
 
-    await new Promise<Number>((resolve, reject) => {
-      this.database.conn.query<OkPacket>(sql, params, (err, res) => {
-        if (err) reject(err.message);
-
-        resolve(res.insertId);
-      });
+    this.database.conn.query<OkPacket>(sql, params, (err, res) => {
+      if (err) throw new AppError(err.message);
     });
   }
 
@@ -74,7 +70,7 @@ export class UserService {
 
     if (!passwordMatch) throw new AppError("Username or password incorrect!");
 
-    const token = sign({}, String(process.env.JWT_SECRET), {
+    const token = sign({}, `${process.env.JWT_SECRET}`, {
       subject: user.id?.toString(),
       expiresIn: "1d",
     });

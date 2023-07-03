@@ -16,19 +16,19 @@ export class NavigationController {
     const { user_id } = request;
 
     const navigationSchema = z.object({
-      currentLocate: z.string().nonempty(),
-      nextLocate: z.string().nonempty(),
+      origin: z.string().nonempty(),
+      destiny: z.string().nonempty(),
       duration: z.string(),
     });
 
-    const { currentLocate, nextLocate, duration } = navigationSchema.parse(
+    const { origin, destiny, duration } = navigationSchema.parse(
       request.body
     );
 
     await this.navigationService.createNavigation({
       fk_user: Number(user_id),
-      currentLocate,
-      nextLocate,
+      origin,
+      destiny,
       duration,
     });
 
