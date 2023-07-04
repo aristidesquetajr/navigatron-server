@@ -1,10 +1,10 @@
 import { RowDataPacket } from "mysql2";
-import { User } from "./User";
 
 export interface Feedback extends RowDataPacket {
   id: number;
+  fkUser: number;
+  fkNavigation: number;
   message: string;
   classification: number;
-
-  fkUser: User;
+  createdAt: Date;
 }
