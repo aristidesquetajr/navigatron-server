@@ -1,7 +1,10 @@
-import { Request, Response } from "express";
 import { inject, injectable } from "tsyringe";
+import { Request, Response } from "express";
 import { z } from "zod";
+
 import { NavigationService } from "../services/navigation.service";
+import { AppError } from "../errors/AppError";
+import { tzem } from "../util/tzem";
 
 @injectable()
 export class NavigationController {
@@ -13,7 +16,7 @@ export class NavigationController {
     request: Request,
     response: Response
   ): Promise<Response> {
-    const { user_id } = request;
+    const fk_user = Number(request.user_id);
 
     const navigationSchema = z.object({
       origin: z.string().nonempty(),
@@ -21,12 +24,16 @@ export class NavigationController {
       duration: z.string(),
     });
 
-    const { origin, destiny, duration } = navigationSchema.parse(
-      request.body
-    );
+    const isNavigationSchemaValid = navigationSchema.safeParse(request.body);
+
+    if (!isNavigationSchemaValid.success) {
+      throw new AppError(tzem(isNavigationSchemaValid.error));
+    }
+
+    const { origin, destiny, duration } = isNavigationSchemaValid.data;
 
     await this.navigationService.createNavigation({
-      fk_user: Number(user_id),
+      fk_user,
       origin,
       destiny,
       duration,
@@ -35,11 +42,16 @@ export class NavigationController {
     return response.status(201).send();
   }
 
-  async listNavigationByUser(request: Request, response: Response): Promise<Response> {
+  async listNavigationByUser(
+    request: Request,
+    response: Response
+  ): Promise<Response> {
     const { user_id } = request;
 
-    const navigations = await this.navigationService.listNavigationByUser(user_id);
+    const navigations = await this.navigationService.listNavigationByUser(
+      user_id
+    );
 
-    return response.json(navigations)
+    return response.json(navigations);
   }
 }

@@ -1,7 +1,10 @@
-import { Request, Response } from "express";
 import { inject, injectable } from "tsyringe";
+import { Request, Response } from "express";
 import { z } from "zod";
+
 import { FeedbackService } from "../services/feedback.service";
+import { AppError } from "../errors/AppError";
+import { tzem } from "../util/tzem";
 
 @injectable()
 export class FeedbackController {
@@ -13,19 +16,25 @@ export class FeedbackController {
     request: Request,
     response: Response
   ): Promise<Response> {
-    const { user_id } = request;
-    const { navigation } = request.query;
+    const fk_user = Number(request.user_id);
+    const fk_navigation = Number(request.query.navigation);
 
     const feedbackSchema = z.object({
       message: z.string().nonempty(),
       classification: z.string().nonempty(),
     });
 
-    const { message, classification } = feedbackSchema.parse(request.body);
+    const isFeedbackSchemaValid = feedbackSchema.safeParse(request.body);
+
+    if (!isFeedbackSchemaValid.success) {
+      throw new AppError(tzem(isFeedbackSchemaValid.error));
+    }
+
+    const { message, classification } = isFeedbackSchemaValid.data;
 
     await this.feedbackService.createFeedback({
-      fk_user: Number(user_id),
-      fk_navigation: Number(navigation),
+      fk_user,
+      fk_navigation,
       message,
       classification,
     });
