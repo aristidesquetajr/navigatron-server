@@ -91,8 +91,7 @@
       "post": {
         "tags": ["Navigation"],
         "description": "Create Navigation",
-        "parameters": [
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -150,6 +149,72 @@
                         "type": "string"
                       },
                       "duration": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feedbacks": {
+      "post": {
+        "tags": ["Feedback"],
+        "description": "Create Feedback",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string"
+                  },
+                  "classification": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "message": "It was amazing",
+                  "classification": "5"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Token missing"
+          },
+          "401": {
+            "description": "Token invalid"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Feedback"],
+        "description": "List Feedback by User",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string"
+                      },
+                      "classification": {
                         "type": "string"
                       }
                     }
