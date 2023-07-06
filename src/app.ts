@@ -4,10 +4,12 @@ import "./shared/container";
 import express, { Application, NextFunction, Request, Response } from "express";
 import "express-async-errors";
 
+import swaggerUi from "swagger-ui-express";
 import cors from "cors";
 
 import { router } from "./routes";
 import { AppError } from "./errors/AppError";
+import swaggerFile from "./swagger.json";
 
 class App {
   public express: Application;
@@ -22,6 +24,8 @@ class App {
   private middlewares() {
     this.express.use(express.json());
     this.express.use(cors());
+
+    this.express.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile))
   }
 
   private routes() {

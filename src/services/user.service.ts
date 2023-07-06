@@ -34,7 +34,7 @@ export class UserService {
     const userAlreadyExists = await this.findUserByEmail(email);
 
     if (userAlreadyExists) {
-      throw new AppError("User Already exists!");
+      throw new AppError("User Already exists!", 409);
     }
 
     const sql = `INSERT INTO users (email, password) VALUES (?, ?);`;
@@ -64,11 +64,11 @@ export class UserService {
   }: IAuthenticate): Promise<IAuthenticateResponse> {
     const user = await this.findUserByEmail(email);
 
-    if (!user) throw new AppError("Username or password incorrect!");
+    if (!user) throw new AppError("Username or password incorrect!", 401);
 
     const passwordMatch = await compare(password, user.password);
 
-    if (!passwordMatch) throw new AppError("Username or password incorrect!");
+    if (!passwordMatch) throw new AppError("Username or password incorrect!", 401);
 
     const token = sign({}, `${process.env.JWT_SECRET}`, {
       subject: user.id?.toString(),
